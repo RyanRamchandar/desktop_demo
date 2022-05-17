@@ -100,9 +100,11 @@ class _BodyState extends State<Body> {
           selectedIndex: _selectedIndex,
         ),
         Expanded(
-          child: Center(
+          child: SingleChildScrollView(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 const SizedBox(height: 50),
                 if (widget.counter > 10)
@@ -111,7 +113,8 @@ class _BodyState extends State<Body> {
                       child: Image(
                           image: AssetImage('assets/images/cubresa-logo.png'))),
                 const SizedBox(height: 50),
-                const Text('Press the + button more than 10 times to see a surprise 🎉'),
+                const Text(
+                    'Press the + button more than 10 times to see a surprise 🎉'),
                 Text(
                   '${widget.counter}',
                   style: Theme.of(context).textTheme.headline4,
@@ -130,7 +133,114 @@ class _BodyState extends State<Body> {
                 TextButton(
                   onPressed: () {},
                   child: const Text('Text Button'),
-                )
+                ),
+                const SizedBox(height: 25),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('This is a card with text'),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Checkbox(value: true, onChanged: null),
+                            SizedBox(width: 4),
+                            Text('Checkbox'),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: 250,
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                                hintText: 'Text field with an alert!'),
+                            onFieldSubmitted: (String value) async {
+                              await showDialog<void>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Thanks!'),
+                                    content: Text(
+                                        'You typed "$value", which has length ${value.characters.length}.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Card(
+                  child: DataTable(
+                    columns: const <DataColumn>[
+                      DataColumn(
+                        label: Text(
+                          'Name',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'Age',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'Role',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'Location',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                      ),
+                    ],
+                    rows: const <DataRow>[
+                      DataRow(
+                        cells: <DataCell>[
+                          DataCell(Text('Sarah')),
+                          DataCell(Text('19')),
+                          DataCell(Text('Student')),
+                          DataCell(Text('Winnipeg, MB')),
+                        ],
+                      ),
+                      DataRow(
+                        cells: <DataCell>[
+                          DataCell(Text('Janine')),
+                          DataCell(Text('43')),
+                          DataCell(Text('Professor')),
+                          DataCell(Text('London, ON')),
+                        ],
+                      ),
+                      DataRow(
+                        cells: <DataCell>[
+                          DataCell(Text('William')),
+                          DataCell(Text('27')),
+                          DataCell(Text('Associate Professor')),
+                          DataCell(Text('Phoenix, AZ')),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 100),
               ],
             ),
           ),
