@@ -17,6 +17,22 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   var _brightness = Brightness.light;
 
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  final colors = [
+    Colors.teal,
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+  ];
+  var _colorIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,13 +40,37 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: _brightness,
-        primarySwatch: Colors.teal,
+        primarySwatch: colors[_colorIndex % colors.length],
       ),
-      home: MyHomePage(
-        title: 'Flutter Demo Desktop Home Page',
-        toggleDarkMode: _toggleDarkMode,
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Flutter Demo Desktop Home Page'),
+          actions: [
+            IconButton(
+                onPressed: _changeColor,
+                icon: const Icon(Icons.color_lens)),
+            IconButton(
+                onPressed: _toggleDarkMode,
+                icon: const Icon(Icons.nightlight_round_sharp)),
+          ],
+        ),
+        body: Body(counter: _counter),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _incrementCounter,
+          tooltip: 'Increment',
+          child: const Text(
+            '🎉',
+            style: TextStyle(fontSize: 30),
+          ),
+        ), // This trailing comma makes auto-formatting nicer for build methods.
       ),
-    );
+      );
+  }
+
+  void _changeColor() {
+    setState((){
+      _colorIndex++;
+    });
   }
 
   void _toggleDarkMode() {
@@ -41,51 +81,6 @@ class _MyAppState extends State<MyApp> {
         _brightness = Brightness.light;
       }
     });
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage(
-      {Key? key, required this.title, required this.toggleDarkMode})
-      : super(key: key);
-
-  final String title;
-  final VoidCallback toggleDarkMode;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          IconButton(
-              onPressed: widget.toggleDarkMode,
-              icon: const Icon(Icons.nightlight_round_sharp))
-        ],
-      ),
-      body: Body(counter: _counter),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Text(
-          '🎉',
-          style: TextStyle(fontSize: 30),
-        ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
   }
 }
 
@@ -105,12 +100,13 @@ class _BodyState extends State<Body> {
   int _selectedIndex = 0;
   late ConfettiController _controllerCenter;
   bool _checked = false;
+  String _dropDownValue = 'Watermelon';
 
   @override
   void initState() {
     super.initState();
     _controllerCenter =
-        ConfettiController(duration: const Duration(seconds: 2));
+        ConfettiController(duration: const Duration(seconds: 1));
   }
 
   @override
@@ -149,6 +145,7 @@ class _BodyState extends State<Body> {
     return Row(
       children: [
         NavigationRail(
+          minWidth: 100,
           labelType: NavigationRailLabelType.all,
           destinations: const [
             NavigationRailDestination(
@@ -175,6 +172,7 @@ class _BodyState extends State<Body> {
           },
           selectedIndex: _selectedIndex,
         ),
+        const VerticalDivider(width: 0,),
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -192,12 +190,9 @@ class _BodyState extends State<Body> {
                         child: Card(
                           child: Padding(
                             padding: EdgeInsets.all(30.0),
-                            child: ColorFiltered(
-                              colorFilter: ColorFilter.mode(Colors.transparent, BlendMode.exclusion),
-                              child: Image(
-                                  image:
-                                      AssetImage('assets/images/cubresa-logo.png')),
-                            ),
+                            child: Image(
+                                image: AssetImage(
+                                    'assets/images/cubresa-logo.png')),
                           ),
                         ),
                       ),
@@ -267,6 +262,31 @@ class _BodyState extends State<Body> {
                               const Text('Checkbox'),
                             ],
                           ),
+                          const SizedBox(height: 10),
+                          DropdownButton(
+                              value: _dropDownValue,
+                              isExpanded: true,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Watermelon',
+                                  child: Text('Watermelon'),
+                                ),
+                                DropdownMenuItem(
+                                    value: 'Peach', child: Text('Peach')),
+                                DropdownMenuItem(
+                                    value: 'Lime', child: Text('Lime')),
+                                DropdownMenuItem(
+                                    value: 'Grape', child: Text('Grape')),
+                                DropdownMenuItem(
+                                    value: 'Mango', child: Text('Mango')),
+                                DropdownMenuItem(
+                                    value: 'Coconut', child: Text('Coconut')),
+                              ],
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _dropDownValue = value ?? '';
+                                });
+                              }),
                           const SizedBox(height: 10),
                           TextFormField(
                             decoration: const InputDecoration(
