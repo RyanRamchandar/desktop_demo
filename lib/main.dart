@@ -7,25 +7,50 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var _brightness = Brightness.light;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        brightness: _brightness,
         primarySwatch: Colors.teal,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Desktop Home Page'),
+      home: MyHomePage(
+        title: 'Flutter Demo Desktop Home Page',
+        toggleDarkMode: _toggleDarkMode,
+      ),
     );
+  }
+
+  void _toggleDarkMode() {
+    setState(() {
+      if (_brightness == Brightness.light) {
+        _brightness = Brightness.dark;
+      } else {
+        _brightness = Brightness.light;
+      }
+    });
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage(
+      {Key? key, required this.title, required this.toggleDarkMode})
+      : super(key: key);
 
   final String title;
+  final VoidCallback toggleDarkMode;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -45,12 +70,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+              onPressed: widget.toggleDarkMode,
+              icon: const Icon(Icons.nightlight_round_sharp))
+        ],
       ),
       body: Body(counter: _counter),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Text(
+          '🎉',
+          style: TextStyle(fontSize: 30),
+        ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -71,6 +104,7 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   int _selectedIndex = 0;
   late ConfettiController _controllerCenter;
+  bool _checked = false;
 
   @override
   void initState() {
@@ -155,29 +189,40 @@ class _BodyState extends State<Body> {
                     children: [
                       const SizedBox(
                         width: 700,
-                        child: Image(
-                            image: AssetImage('assets/images/cubresa-logo.png')),
+                        child: Card(
+                          child: Padding(
+                            padding: EdgeInsets.all(30.0),
+                            child: ColorFiltered(
+                              colorFilter: ColorFilter.mode(Colors.transparent, BlendMode.exclusion),
+                              child: Image(
+                                  image:
+                                      AssetImage('assets/images/cubresa-logo.png')),
+                            ),
+                          ),
+                        ),
                       ),
                       ConfettiWidget(
                         confettiController: _controllerCenter..play(),
-                        blastDirectionality: BlastDirectionality
-                            .explosive, // don't specify a direction, blast randomly
-                        shouldLoop:
-                        false, // start again as soon as the animation is finished
+                        blastDirectionality: BlastDirectionality.explosive,
+                        // don't specify a direction, blast randomly
+                        shouldLoop: false,
+                        // start again as soon as the animation is finished
                         colors: const [
                           Colors.green,
                           Colors.blue,
                           Colors.pink,
                           Colors.orange,
                           Colors.purple
-                        ], // manually specify the colors to be used
-                        createParticlePath: drawStar, // define a custom shape/path.
+                        ],
+                        // manually specify the colors to be used
+                        createParticlePath:
+                            drawStar, // define a custom shape/path.
                       )
                     ],
                   ),
                 const SizedBox(height: 50),
                 const Text(
-                    'Press the + button more than 10 times to see a surprise 🎉'),
+                    'Press the 🎉 button more than 10 times to see a surprise'),
                 Text(
                   '${widget.counter}',
                   style: Theme.of(context).textTheme.headline4,
@@ -198,26 +243,32 @@ class _BodyState extends State<Body> {
                   child: const Text('Text Button'),
                 ),
                 const SizedBox(height: 25),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('This is a card with text'),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Checkbox(value: true, onChanged: null),
-                            SizedBox(width: 4),
-                            Text('Checkbox'),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          width: 250,
-                          child: TextFormField(
+                SizedBox(
+                  width: 400,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SelectableText('This text is selectable'),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                  value: _checked,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _checked = value ?? false;
+                                    });
+                                  }),
+                              const SizedBox(width: 4),
+                              const Text('Checkbox'),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
                             decoration: const InputDecoration(
                                 hintText: 'Text field with an alert!'),
                             onFieldSubmitted: (String value) async {
@@ -241,8 +292,12 @@ class _BodyState extends State<Body> {
                               );
                             },
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 20),
+                          const LinearProgressIndicator(
+                            minHeight: 20,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
